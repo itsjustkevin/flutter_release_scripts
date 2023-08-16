@@ -16,4 +16,4 @@ let data = await octokit.request('GET /repos/{owner}/{repo}/issues/{issue_number
 let strippedBody = data.data.body.replaceAll('#', '')
 let parsedBody = JSON.parse(strippedBody)
 console.log(parsedBody);
-// user.login gives the
+

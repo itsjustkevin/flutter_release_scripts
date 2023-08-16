@@ -11,8 +11,8 @@ const octokit = new Octokit({ auth: TOKEN })
 let data = await octokit.request('POST /repos/{owner}/{repo}/releases/generate-notes', {
   owner: 'flutter',
   repo: 'flutter',
-  tag_name: '3.7.0-1.4.pre',
-  previous_tag_name: '3.3.0'
+  tag_name: '3.13.0-0.4.pre',
+  previous_tag_name: '3.10.0'
 })
 
 // grab the information I care about stripping headers.
@@ -38,9 +38,7 @@ const transformLink = (line) => {
   return line.replace(/(https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/)(\d+)/, '[$2]($1$2)');
 }
 
-let endData = fileLines.map( fileLine => {
-  transformLink(fileLine)
-})
+let endData = fileLines.map( fileLine => transformLink(fileLine))
 
 // TODO(kevin): rejoin lines on \n before writing back to file
-await fs.writeFile('release-notes.md', endData)
+await fs.writeFile('release-notes.md', endData.join('\n'))
