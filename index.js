@@ -39,6 +39,12 @@ const generateReleaseNotes = async (repo) => {
 
   let notes = data.data.body;
 
+  notes = notes.split('\n')
+    .filter(line => !line
+      .includes('<!-- Release notes generated using configuration in .github/release.yml'))
+      .join('\n')
+      .trimStart();
+
   const transformLink = (line) => {
     return line.replace(/(https:\/\/github\.com\/[^/]+\/[^/]+\/pull\/)(\d+)/, '[$2]($1$2)');
   };
