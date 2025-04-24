@@ -29,12 +29,12 @@ const extractNewContributors = (notes) => {
   return newContributorSet;
 };
 
-const generateReleaseNotes = async (repo) => {
+const generateReleaseNotes = async () => {
   let data = await octokit.request('POST /repos/{owner}/{repo}/releases/generate-notes', {
     owner: 'flutter',
-    repo: repo,
-    tag_name: '3.16.0-0.5.pre',
-    previous_tag_name: '3.13.0'
+    repo: 'flutter',
+    tag_name: '3.32.0-0.2.pre',
+    previous_tag_name: '3.29.0'
   });
 
   let notes = data.data.body;
@@ -64,37 +64,21 @@ const generateReleaseNotes = async (repo) => {
   };
 };
 
-const combineContributorLists = (list1, list2) => {
-  const combinedSet = new Set([...list1, ...list2]);
-  return Array.from(combinedSet);
-};
-
-const printContributorTable = (frameworkData, engineData) => {
-  const combinedContributors = combineContributorLists(frameworkData.contributors, engineData.contributors);
-  const combinedNewContributors = new Set([...frameworkData.newContributors, ...engineData.newContributors]);
-
-  const contributorTableData = combinedContributors.map(username => ({
+const printContributorStats = (data) => {
+  const contributorTableData = data.contributors.map(username => ({
     Username: `@${username}`,
-    'New Contributor': combinedNewContributors.has(username) ? 'Yes' : 'No'
+    'New Contributor': data.newContributors.has(username) ? 'Yes' : 'No'
   }));
 
-  console.log(`Combined Contributor Statistics:`);
+  console.log(`Contributor Statistics:`);
   console.table(contributorTableData);
-  console.log(`Framework Commits: ${frameworkData.commitCount}, Contributors: ${frameworkData.contributors.length}, New Contributors: ${frameworkData.newContributors.size}`);
-  console.log(`Engine Commits: ${engineData.commitCount}, Contributors: ${engineData.contributors.length}, New Contributors: ${engineData.newContributors.size}`);
-  console.log(`Total Commits: ${frameworkData.commitCount + engineData.commitCount}, Unique Contributors: ${combinedContributors.length}, Total New Contributors: ${combinedNewContributors.size}`);
+  console.log(`Total Commits: ${data.commitCount}, Unique Contributors: ${data.contributors.length}, New Contributors: ${data.newContributors.size}`);
 };
 
 const writeReleaseNotes = async () => {
-  const frameworkData = await generateReleaseNotes('flutter');
-  const engineData = await generateReleaseNotes('engine');
-
-  const combinedNotes = `Framework\n\n${frameworkData.notes}\n\nEngine\n\n${engineData.notes}`;
-
-  await fs.writeFile('release-notes.md', combinedNotes);
-
-  // Print combined contributor table and statistics to the console
-  printContributorTable(frameworkData, engineData);
+  const releaseData = await generateReleaseNotes();
+  await fs.writeFile('release-notes.md', releaseData.notes);
+  printContributorStats(releaseData);
 };
 
 writeReleaseNotes().catch(console.error);
