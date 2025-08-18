@@ -33,8 +33,8 @@ const generateReleaseNotes = async () => {
   let data = await octokit.request('POST /repos/{owner}/{repo}/releases/generate-notes', {
     owner: 'flutter',
     repo: 'flutter',
-    tag_name: '3.32.0-0.2.pre',
-    previous_tag_name: '3.29.0'
+    tag_name: '3.35.0-0.2.pre',
+    previous_tag_name: '3.32.0'
   });
 
   let notes = data.data.body;
